@@ -218,6 +218,7 @@ export const policies: Policy[] = [
           'Payment providers that process your payment.',
           'Shipping carriers and fulfillment partners that pack and deliver your order.',
           'Analytics and advertising providers, if you have allowed the related cookies.',
+          'Microsoft Clarity, which records how visitors use our store (clicks, scrolling and anonymized session replays) so we can improve it. Personal details you type, such as your address and payment information, are masked. See the Microsoft Privacy Statement at https://privacy.microsoft.com/privacystatement.',
           'Authorities, where we are required to by law.'
         ]
       },

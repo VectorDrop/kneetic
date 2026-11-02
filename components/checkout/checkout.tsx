@@ -941,7 +941,13 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
           </div>
         </aside>
 
-        <form ref={formRef} className={css.form} onSubmit={onSubmit} noValidate>
+        <form
+          ref={formRef}
+          className={css.form}
+          onSubmit={onSubmit}
+          noValidate
+          data-clarity-mask="True"
+        >
           {showBump && bump && (
             <label className={clsx(css.bump, bump.checked && css.bumpOn, bumpBusy && css.busy)}>
               <span className={css.bumpBadge}>{c.bump.badge}</span>

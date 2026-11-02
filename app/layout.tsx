@@ -3,6 +3,7 @@ import { HideOnPaths } from 'components/sales/hide-on-paths';
 import { GeistSans } from 'geist/font';
 import { siteUrl } from 'lib/site-url';
 import { ensureStartsWith } from 'lib/utils';
+import Script from 'next/script';
 import { ReactNode, Suspense } from 'react';
 import './globals.css';
 
@@ -41,6 +42,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <Suspense>
           <main>{children}</main>
         </Suspense>
+        {/* Microsoft Clarity (heatmaps + session recordings). Loads after the page is interactive. */}
+        <Script id="ms-clarity" strategy="afterInteractive">
+          {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z7c3pxq3cv");`}
+        </Script>
       </body>
     </html>
   );
