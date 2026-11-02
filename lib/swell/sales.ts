@@ -7,6 +7,8 @@
 import { GraphQLClient } from 'graphql-request';
 import { SWELL_GRAPHQL_API_ENDPOINT, TAGS } from 'lib/constants';
 import { salesFallbackImages } from 'lib/sales-content';
+import { packCount, packOption } from 'lib/sales-pricing';
+import { revalidateTag } from 'next/cache';
 import type {
   BuyOptionInput,
   PriceRule,
@@ -87,7 +89,7 @@ const BUY_NOW = `mutation salesBuyNow($productId: ID!, $quantity: Int!, $options
   }
 }`;
 
-type Mode = 'product' | 'cart';
+type Mode = 'product' | 'fresh' | 'cart';
 
 function swellClient(mode: Mode): GraphQLClient | null {
   const storeId = process.env.SWELL_STORE_ID;
@@ -96,13 +98,14 @@ function swellClient(mode: Mode): GraphQLClient | null {
 
   return new GraphQLClient(`https://${storeId}.swell.store${SWELL_GRAPHQL_API_ENDPOINT}`, {
     headers: { Authorization: key },
-    // Product data: cached for 5 minutes and cleared by your existing Swell revalidation webhook.
-    // Cart: never cached. No X-Session header is sent, so every order starts a fresh cart.
+    // Product data: cached for 1 minute and cleared by your Swell revalidation webhook.
+    // 'fresh' (used by checkout) and cart calls are never cached. No X-Session header is sent,
+    // so every order starts a fresh cart.
     fetch: (input: RequestInfo | URL, init?: RequestInit) =>
       fetch(
         input,
         mode === 'product'
-          ? { ...init, next: { revalidate: 300, tags: [TAGS.products] } }
+          ? { ...init, next: { revalidate: 60, tags: [TAGS.products] } }
           : { ...init, cache: 'no-store' }
       )
   });
@@ -211,8 +214,8 @@ export function normalizeProduct(p: any): SalesProduct {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /** Loads the product shown on the sales page. Never throws: falls back to local images. */
-export async function getSalesProduct(): Promise<SalesProduct> {
-  const client = swellClient('product');
+export async function getSalesProduct(mode: 'product' | 'fresh' = 'product'): Promise<SalesProduct> {
+  const client = swellClient(mode);
   if (!client) {
     console.warn('[sales] SWELL_STORE_ID / SWELL_PUBLIC_KEY missing, showing fallback product.');
     return fallbackProduct();
@@ -237,6 +240,52 @@ export async function getSalesProduct(): Promise<SalesProduct> {
   return fallbackProduct();
 }
 
+/**
+ * Matches the shopper's choices to the product as it is in Swell *right now*.
+ *
+ * The page can be showing slightly older product data (it is cached). If an option was added in
+ * Swell since then, e.g. "How many pairs?", the page doesn't send it and Swell rejects the item.
+ * This keeps the values that still exist and fills in the rest: the pack option from the number
+ * of pairs ordered (quantity becomes 1, since the pack variant already holds the pairs), other
+ * required options with their first value.
+ */
+function repairOrder(
+  product: SalesProduct,
+  quantity: number,
+  options: BuyOptionInput[]
+): { quantity: number; options: BuyOptionInput[] } {
+  const sent = (name: string) =>
+    options.find((o) => o.name.trim().toLowerCase() === name.trim().toLowerCase());
+  const pack = packOption(product);
+  let qty = quantity;
+  const out: BuyOptionInput[] = [];
+
+  for (const option of product.options) {
+    const chosen = sent(option.name);
+    const match = chosen && option.values.find((v) => v.name === chosen.value);
+    if (match) {
+      out.push({ name: option.name, value: match.name });
+      if (option === pack) qty = 1;
+      continue;
+    }
+    if (option === pack) {
+      // Pick the pack with exactly this many pairs; otherwise single pairs x quantity.
+      const exact = option.values.find((v) => packCount(v.name) === quantity);
+      const single = option.values.find((v) => packCount(v.name) === 1);
+      const value = exact ?? single ?? option.values[0];
+      if (value) {
+        out.push({ name: option.name, value: value.name });
+        qty = exact ? 1 : quantity;
+      }
+      continue;
+    }
+    if (option.required && option.values[0]) {
+      out.push({ name: option.name, value: option.values[0].name });
+    }
+  }
+  return { quantity: qty, options: out };
+}
+
 /** Creates a fresh cart with exactly this item and returns Swell's checkout URL. */
 export async function createBuyNowCheckout(
   productId: string,
@@ -245,11 +294,31 @@ export async function createBuyNowCheckout(
 ): Promise<string> {
   const client = swellClient('cart');
   if (!client) throw new Error('Swell is not configured');
-  const data = await client.request<{ addCartItem: { checkoutUrl: string | null } | null }>(
-    BUY_NOW,
-    { productId, quantity, options: options.length ? options : undefined }
-  );
-  const url = data.addCartItem?.checkoutUrl;
-  if (!url) throw new Error('Swell returned no checkout URL');
-  return url;
+
+  const addToNewCart = async (qty: number, opts: BuyOptionInput[]) => {
+    const data = await client.request<{ addCartItem: { checkoutUrl: string | null } | null }>(
+      BUY_NOW,
+      { productId, quantity: qty, options: opts.length ? opts : undefined }
+    );
+    const url = data.addCartItem?.checkoutUrl;
+    if (!url) throw new Error('Swell returned no checkout URL');
+    return url;
+  };
+
+  try {
+    return await addToNewCart(quantity, options);
+  } catch (firstError) {
+    // Most likely the page showed outdated product data. Clear the cache so the next visitor
+    // sees the current product, then retry once with the options Swell has right now.
+    try {
+      revalidateTag(TAGS.products);
+    } catch {
+      // Not fatal: the cache also expires on its own after a minute.
+    }
+    const fresh = await getSalesProduct('fresh');
+    if (!fresh.live || fresh.id !== productId) throw firstError;
+    const repaired = repairOrder(fresh, quantity, options);
+    console.warn('[sales] Checkout retried with current Swell options:', repaired);
+    return addToNewCart(repaired.quantity, repaired.options);
+  }
 }
