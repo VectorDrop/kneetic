@@ -5,7 +5,8 @@ import { getSalesProduct } from 'lib/swell/sales';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-export const runtime = 'edge';
+// Node.js runtime: the edge runtime's 1 MB limit (Vercel Hobby) is too small for the Swell SDK.
+export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
   title: 'Secure Checkout',
