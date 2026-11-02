@@ -1,7 +1,15 @@
 'use client';
 
-import { isSizeOption, stockFor, totalFor, unitPrice, type Selection } from 'lib/sales-pricing';
-import type { SalesProduct } from 'lib/sales-types';
+import {
+  isSizeOption,
+  packOption,
+  packValues,
+  singlePairPrice,
+  stockFor,
+  totalFor,
+  type Selection
+} from 'lib/sales-pricing';
+import type { SalesOption, SalesProduct } from 'lib/sales-types';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { buyNow } from './actions';
 
@@ -16,7 +24,10 @@ type BuyState = {
   orig: number | null;
   /** What the chosen quantity costs, including Swell's multi-pair price. */
   total: number | null;
-  totalFor: (qty: number) => ReturnType<typeof totalFor>;
+  /** Totals for an offer tile: `qty` pairs, or a pack value from Swell. */
+  totalFor: (qty: number, packValueId?: string) => ReturnType<typeof totalFor>;
+  /** Swell option that sells several pairs as its own variant (e.g. "1 Pair" / "2 Pairs"), if any. */
+  pack: SalesOption | undefined;
   stock: number | null;
   soldOut: boolean;
   loading: boolean;
@@ -47,11 +58,14 @@ export function BuyStateProvider({
   defaultQty: number;
   children: ReactNode;
 }) {
-  // Pre-select options with a single value and non-size options. Size stays a conscious choice.
+  const pack = useMemo(() => packOption(product), [product]);
+
+  // Pre-select options with a single value and non-size options (the pack starts at 1 pair).
+  // Size stays a conscious choice.
   const [selection, setSelection] = useState<Selection>(() => {
     const init: Selection = {};
     product.options.forEach((o) => {
-      const first = o.values[0];
+      const first = pack && o.id === pack.id ? packValues(o)[0] : o.values[0];
       if (first && (o.values.length === 1 || !isSizeOption(o.name))) init[o.id] = first.id;
     });
     return init;
@@ -72,7 +86,7 @@ export function BuyStateProvider({
     return () => window.removeEventListener('pageshow', onShow);
   }, []);
 
-  const { price, orig } = useMemo(() => unitPrice(product, selection, 1), [product, selection]);
+  const { price, orig } = useMemo(() => singlePairPrice(product, selection), [product, selection]);
   const { total } = useMemo(() => totalFor(product, selection, qty), [product, selection, qty]);
   const stock = useMemo(() => stockFor(product, selection), [product, selection]);
   const soldOut = stock !== null && stock <= 0;
@@ -108,7 +122,8 @@ export function BuyStateProvider({
 
     let result: Awaited<ReturnType<typeof buyNow>>;
     try {
-      result = await buyNow({ productId: product.id, quantity: qty, options });
+      // With a pack option, the pack variant already holds the number of pairs and its price.
+      result = await buyNow({ productId: product.id, quantity: pack ? 1 : qty, options });
     } catch {
       result = { error: 'network' };
     }
@@ -129,7 +144,8 @@ export function BuyStateProvider({
     price,
     orig,
     total,
-    totalFor: (q) => totalFor(product, selection, q),
+    totalFor: (q, packValueId) => totalFor(product, selection, q, packValueId),
+    pack,
     stock,
     soldOut,
     loading,

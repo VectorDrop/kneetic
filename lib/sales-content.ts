@@ -116,9 +116,14 @@ export const hero = {
 export const buyBox = {
   ctaLabel: 'Get My Sleeves',
   quantityLabel: 'How many pairs?',
+  /**
+   * If your Swell product has a pack option (e.g. "1 Pair" / "2 Pairs" as variants), its values are
+   * shown as these tiles automatically, with prices from Swell. The notes below are matched by the
+   * number of pairs. `quantities` is only used when there is no pack option.
+   */
+  packNotes: { 1: 'For your heavy days', 2: 'Gym bag + meet day' } as Record<number, string>,
   quantities: [
     { qty: 1, label: '1 Pair', note: 'For your heavy days' },
-    // The 2-pair price comes from a quantity price rule on the product in Swell (min. quantity 2).
     { qty: 2, label: '2 Pairs', note: 'Gym bag + meet day' }
   ],
   trust: ['Secure checkout', '30-day guarantee', 'Real 7mm neoprene']

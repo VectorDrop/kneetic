@@ -10,7 +10,7 @@ import {
   sizeGuide,
   urgency
 } from 'lib/sales-content';
-import { formatMoney, isSizeOption } from 'lib/sales-pricing';
+import { formatMoney, isSizeOption, packCount, packValues } from 'lib/sales-pricing';
 import Image from 'next/image';
 import { useRef } from 'react';
 import { useBuy } from './buy-state';
@@ -34,7 +34,8 @@ export function BuyBox({ id }: { id: string }) {
     error,
     missing,
     checkout,
-    showImage
+    showImage,
+    pack
   } = useBuy();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const openGuide = () => dialogRef.current?.showModal();
@@ -42,6 +43,27 @@ export function BuyBox({ id }: { id: string }) {
   const lowStock = stock !== null && stock > 0 && stock <= urgency.lowStockThreshold;
   const hasSizeOption = product.options.some((o) => isSizeOption(o.name));
   const boxError = error && error.box === id ? error.message : null;
+
+  // "How many pairs?" tiles: the pack option from Swell when there is one, otherwise plain quantities.
+  const offers = pack
+    ? packValues(pack).map((v) => ({
+        key: v.id,
+        label: v.name,
+        note: buyBox.packNotes[packCount(v.name)] ?? '',
+        qty: 1,
+        packValueId: v.id as string | undefined,
+        active: selection[pack.id] === v.id,
+        choose: () => select(pack.id, v.id)
+      }))
+    : buyBox.quantities.map((q) => ({
+        key: String(q.qty),
+        label: q.label,
+        note: q.note,
+        qty: q.qty,
+        packValueId: undefined as string | undefined,
+        active: qty === q.qty,
+        choose: () => setQty(q.qty)
+      }));
 
   return (
     <div className={css.buyBox} id={id}>
@@ -67,68 +89,70 @@ export function BuyBox({ id }: { id: string }) {
         </div>
       </div>
 
-      {product.options.map((opt) => {
-        const isSize = isSizeOption(opt.name);
-        const isMissing = missing.indexOf(opt.id) !== -1;
-        return (
-          <fieldset
-            key={opt.id}
-            id={`${id}-opt-${opt.id}`}
-            className={clsx(css.optGroup, isMissing && css.optMissing)}
-          >
-            <legend className={css.optLegend}>
-              <span>
-                {opt.name}
-                {opt.required && !selection[opt.id] && (
-                  <em className={css.optHint}> · {isMissing ? 'please choose' : 'choose one'}</em>
-                )}
-              </span>
-              {isSize && (
-                <button type="button" className={css.linkBtn} onClick={openGuide}>
-                  <Icon name="ruler" size={18} /> Size guide
-                </button>
-              )}
-            </legend>
-            <div
-              className={clsx(
-                css.chips,
-                opt.values.some((v) => imageIndexFor(v.name) !== null) && css.chipsWide
-              )}
+      {product.options
+        .filter((opt) => !pack || opt.id !== pack.id)
+        .map((opt) => {
+          const isSize = isSizeOption(opt.name);
+          const isMissing = missing.indexOf(opt.id) !== -1;
+          return (
+            <fieldset
+              key={opt.id}
+              id={`${id}-opt-${opt.id}`}
+              className={clsx(css.optGroup, isMissing && css.optMissing)}
             >
-              {opt.values.map((v) => {
-                const active = selection[opt.id] === v.id;
-                const imgIndex = imageIndexFor(v.name);
-                const swatch = imgIndex !== null ? product.images[imgIndex] : undefined;
-                return (
-                  <button
-                    key={v.id}
-                    type="button"
-                    className={clsx(css.chip, swatch && css.chipSwatch, active && css.chipActive)}
-                    aria-pressed={active}
-                    onClick={() => {
-                      select(opt.id, v.id);
-                      if (imgIndex !== null) showImage(imgIndex);
-                    }}
-                  >
-                    {swatch && (
-                      <span className={css.swatchImg}>
-                        <Image src={swatch.src} alt="" fill sizes="48px" />
-                      </span>
-                    )}
-                    {v.name}
-                    {!opt.variant && v.price > 0 && (
-                      <small className={css.chipExtra}>
-                        {' '}
-                        +{formatMoney(v.price, product.currency)}
-                      </small>
-                    )}
+              <legend className={css.optLegend}>
+                <span>
+                  {opt.name}
+                  {opt.required && !selection[opt.id] && (
+                    <em className={css.optHint}> · {isMissing ? 'please choose' : 'choose one'}</em>
+                  )}
+                </span>
+                {isSize && (
+                  <button type="button" className={css.linkBtn} onClick={openGuide}>
+                    <Icon name="ruler" size={18} /> Size guide
                   </button>
-                );
-              })}
-            </div>
-          </fieldset>
-        );
-      })}
+                )}
+              </legend>
+              <div
+                className={clsx(
+                  css.chips,
+                  opt.values.some((v) => imageIndexFor(v.name) !== null) && css.chipsWide
+                )}
+              >
+                {opt.values.map((v) => {
+                  const active = selection[opt.id] === v.id;
+                  const imgIndex = imageIndexFor(v.name);
+                  const swatch = imgIndex !== null ? product.images[imgIndex] : undefined;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      className={clsx(css.chip, swatch && css.chipSwatch, active && css.chipActive)}
+                      aria-pressed={active}
+                      onClick={() => {
+                        select(opt.id, v.id);
+                        if (imgIndex !== null) showImage(imgIndex);
+                      }}
+                    >
+                      {swatch && (
+                        <span className={css.swatchImg}>
+                          <Image src={swatch.src} alt="" fill sizes="48px" />
+                        </span>
+                      )}
+                      {v.name}
+                      {!opt.variant && v.price > 0 && (
+                        <small className={css.chipExtra}>
+                          {' '}
+                          +{formatMoney(v.price, product.currency)}
+                        </small>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+          );
+        })}
 
       {!hasSizeOption && (
         <button type="button" className={clsx(css.linkBtn, css.linkBtnAlone)} onClick={openGuide}>
@@ -136,27 +160,26 @@ export function BuyBox({ id }: { id: string }) {
         </button>
       )}
 
-      {buyBox.quantities.length > 1 && (
+      {offers.length > 1 && (
         <fieldset className={css.optGroup}>
           <legend className={css.optLegend}>
             <span>{buyBox.quantityLabel}</span>
           </legend>
           <div className={css.qtyGrid}>
-            {buyBox.quantities.map((q) => {
-              const active = qty === q.qty;
-              const t = totalFor(q.qty);
+            {offers.map((o) => {
+              const t = totalFor(o.qty, o.packValueId);
               return (
                 <button
-                  key={q.qty}
+                  key={o.key}
                   type="button"
-                  className={clsx(css.qtyTile, active && css.qtyTileActive)}
-                  aria-pressed={active}
-                  onClick={() => setQty(q.qty)}
+                  className={clsx(css.qtyTile, o.active && css.qtyTileActive)}
+                  aria-pressed={o.active}
+                  onClick={o.choose}
                 >
                   <span className={css.qtyRadio} aria-hidden="true" />
                   <span className={css.qtyText}>
-                    <strong>{q.label}</strong>
-                    <small>{q.note}</small>
+                    <strong>{o.label}</strong>
+                    {o.note && <small>{o.note}</small>}
                   </span>
                   {t.total !== null && (
                     <span className={css.qtyPrice}>
