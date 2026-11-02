@@ -1,0 +1,13 @@
+HTTP/1.1 401 Unauthorized
+Date: Sun, 01 Nov 2026 19:45:14 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 152
+Connection: keep-alive
+access-control-allow-credentials: true
+access-control-expose-headers: X-Session
+vary: Origin, Accept-Encoding
+cf-cache-status: DYNAMIC
+Server: cloudflare
+CF-RAY: a53d6612a82c5729-BEY
+
+{"error":{"code":"AUTHENTICATION","message":"You must authenticate with your public key. Also, make sure withCredentials is enabled for all requests."}}

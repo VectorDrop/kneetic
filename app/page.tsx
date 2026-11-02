@@ -1,27 +1,21 @@
-import { Carousel } from 'components/carousel';
-import { ThreeItemGrid } from 'components/grid/three-items';
-import Footer from 'components/layout/footer';
-import { Suspense } from 'react';
+import { SalesPage } from 'components/sales/sales-page';
+import { meta } from 'lib/sales-content';
+import { getSalesProduct } from 'lib/swell/sales';
 
 export const runtime = 'edge';
 
 export const metadata = {
-  description: 'High-performance ecommerce store built with Next.js, Vercel, and Swell.',
+  title: { absolute: meta.title },
+  description: meta.description,
   openGraph: {
-    type: 'website'
+    type: 'website',
+    title: meta.title,
+    description: meta.description,
+    images: ['/carousel/01-hero.jpg']
   }
 };
 
 export default async function HomePage() {
-  return (
-    <>
-      <ThreeItemGrid />
-      <Suspense>
-        <Carousel />
-        <Suspense>
-          <Footer />
-        </Suspense>
-      </Suspense>
-    </>
-  );
+  const product = await getSalesProduct();
+  return <SalesPage product={product} />;
 }
