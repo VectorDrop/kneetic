@@ -17,6 +17,7 @@ import { checkoutContent as c, fill } from 'lib/checkout-content';
 import { imageIndexFor } from 'lib/sales-content';
 import { formatMoney, packCount, packOption, unitPrice, type Selection } from 'lib/sales-pricing';
 import type { SalesProduct } from 'lib/sales-types';
+import { whopTrack } from 'lib/whop-pixel';
 import Link from 'next/link';
 import {
   useCallback,
@@ -437,6 +438,11 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
       // Show the page right away; shipping is set up in the background.
       setCart(next);
       setPhase('ready');
+      whopTrack('begin_checkout', {
+        value: next.grand_total,
+        currency: next.currency || 'USD',
+        event_id: `checkout_${checkoutId}`
+      });
 
       // Swell needs a country to show shipping options and tax.
       try {
@@ -582,10 +588,12 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
     try {
       // Saving the email early lets Swell send abandoned-cart reminders.
       await swell.cart.update({ account: { email: email.trim() } });
+      // One lead per checkout (same event_id if they change the email).
+      whopTrack('lead', { email: email.trim(), event_id: `lead_${checkoutId}` });
     } catch {
       // Saved again on submit.
     }
-  }, [email]);
+  }, [email, checkoutId]);
 
   /* ---------- Derived data ---------- */
   const item = cart?.items?.[0];

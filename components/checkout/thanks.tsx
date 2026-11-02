@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { Icon } from 'components/sales/icons';
 import { checkoutContent as c, fill } from 'lib/checkout-content';
 import { formatMoney } from 'lib/sales-pricing';
+import { whopTrack } from 'lib/whop-pixel';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import css from './checkout.module.css';
@@ -19,6 +20,27 @@ function addDays(from: Date, days: number): Date {
 }
 
 const shortDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+/** Whop Pixel purchase. event_id = the Swell order, so a page reload never counts twice. */
+function trackPurchase(order: SwellOrder) {
+  const value = order.grand_total ?? 0;
+  if (!order.id || !(value > 0)) return;
+  const ship = order.shipping;
+  const [first, ...rest] = (ship?.name || '').trim().split(' ');
+  whopTrack('purchase', {
+    value,
+    currency: order.currency || 'USD',
+    event_id: `order_${order.id}`,
+    email: order.account?.email,
+    first_name: ship?.first_name || first,
+    last_name: ship?.last_name || rest.join(' '),
+    phone: ship?.phone,
+    city: ship?.city,
+    state: ship?.state,
+    postal_code: ship?.zip,
+    country: ship?.country
+  });
+}
 
 export function Thanks({ checkoutId, storeId, publicKey, className }: Props) {
   const [order, setOrder] = useState<SwellOrder | null>(null);
@@ -35,6 +57,7 @@ export function Thanks({ checkoutId, storeId, publicKey, className }: Props) {
           if (result && result.id && !swellError(result)) {
             if (!cancelled) {
               setOrder(result as SwellOrder);
+              trackPurchase(result as SwellOrder);
               setState('ready');
             }
             return;

@@ -11,6 +11,7 @@ import {
 } from 'lib/sales-pricing';
 import type { SalesOption, SalesProduct } from 'lib/sales-types';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { newEventId, whopTrack } from 'lib/whop-pixel';
 import { buyNow } from './actions';
 
 type BuyState = {
@@ -116,6 +117,11 @@ export function BuyStateProvider({
 
     setLoading(true);
     setError(null);
+    whopTrack('add_to_cart', {
+      value: total ?? undefined,
+      currency: product.currency,
+      event_id: newEventId('cart')
+    });
     const options = product.options
       .map((o) => ({ name: o.name, value: o.values.find((v) => v.id === selection[o.id])?.name }))
       .filter((o): o is { name: string; value: string } => typeof o.value === 'string');
