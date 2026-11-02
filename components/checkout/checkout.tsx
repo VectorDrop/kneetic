@@ -148,6 +148,24 @@ function selectionOf(product: SalesProduct, item: SwellItem): Selection {
   return sel;
 }
 
+/**
+ * The page starts downloading Stripe.js immediately (see app/checkout/[id]/page.tsx).
+ * Waiting for that download stops swell-js from loading Stripe a second time.
+ */
+function stripeLoaded(timeoutMs = 8000): Promise<void> {
+  return new Promise((resolve) => {
+    const started = Date.now();
+    const check = () => {
+      if ((window as unknown as { Stripe?: unknown }).Stripe || Date.now() - started > timeoutMs) {
+        resolve();
+      } else {
+        setTimeout(check, 40);
+      }
+    };
+    check();
+  });
+}
+
 /** Waits for swell-js to turn the card into a payment on the cart. */
 function tokenizeCard(swell: SwellBrowser): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -351,6 +369,7 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
 
   const [card, setCard] = useState({ ready: false, complete: false, error: '' });
   const [wallets, setWallets] = useState<Wallets>({ apple: false, google: false });
+  const [walletsLoading, setWalletsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -390,13 +409,13 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
       }
       swellRef.current = swell;
 
-      let next: SwellCart | null = null;
-      try {
-        const recovered = await swell.cart.recover(checkoutId);
-        if (!swellError(recovered) && recovered?.items?.length) next = recovered;
-      } catch {
-        next = null;
-      }
+      // Cart and payment settings load in parallel (each is a round trip to Swell).
+      const [recovered, methods] = await Promise.all([
+        swell.cart.recover(checkoutId).catch(() => null),
+        swell.settings.payments().catch(() => null)
+      ]);
+      let next: SwellCart | null =
+        recovered && !swellError(recovered) && recovered.items?.length ? recovered : null;
 
       if (!next) {
         if (await alreadyOrdered(swell)) {
@@ -406,12 +425,18 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
         if (!cancelled) setPhase('expired');
         return;
       }
+      if (cancelled) return;
 
       // Prefill anything Swell already knows (returning shoppers, abandoned-cart links).
       const country = next.shipping?.country || 'US';
       if (next.account?.email) setEmail(next.account.email);
       setShip(fromSwell(next.shipping, country));
       setBill(fromSwell(next.billing, country));
+      if (methods) setWallets({ apple: !!methods.apple, google: !!methods.google });
+
+      // Show the page right away; shipping is set up in the background.
+      setCart(next);
+      setPhase('ready');
 
       // Swell needs a country to show shipping options and tax.
       try {
@@ -424,20 +449,9 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
           const updated = await swell.cart.update({ shipping: { service: services[0].id } });
           if (!swellError(updated) && updated?.items) next = updated;
         }
+        if (!cancelled && next) setCart(next);
       } catch {
         // Not fatal: shipping is set again when the order is placed.
-      }
-
-      try {
-        const methods = await swell.settings.payments();
-        if (!cancelled && methods) setWallets({ apple: !!methods.apple, google: !!methods.google });
-      } catch {
-        // Wallet buttons simply stay hidden.
-      }
-
-      if (!cancelled) {
-        setCart(next);
-        setPhase('ready');
       }
     })();
 
@@ -473,46 +487,65 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
       }
     };
 
-    swell.payment
-      .createElements({
-        card: {
-          elementId: 'kneetic-card',
-          options: {
-            hidePostalCode: true,
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#10213d',
-                fontFamily:
-                  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
-                '::placeholder': { color: '#8a94a3' }
-              },
-              invalid: { color: '#d6282e', iconColor: '#d6282e' }
-            }
-          },
-          onReady: () => setCard((s) => ({ ...s, ready: true })),
-          onChange: (e: { complete?: boolean; error?: { message?: string } }) =>
-            setCard({ ready: true, complete: !!e.complete, error: e.error?.message || '' }),
-          onError: (e: unknown) => setCard((s) => ({ ...s, ready: true, error: errorMessage(e) }))
-        },
-        ...(wallets.apple && {
-          apple: {
-            ...walletParams,
-            elementId: 'kneetic-applepay',
-            style: { theme: 'dark', height: '48px' },
-            onError: () => setWallets((w) => ({ ...w, apple: false }))
-          }
-        }),
-        ...(wallets.google && {
-          google: {
-            ...walletParams,
-            elementId: 'kneetic-googlepay',
-            style: { color: 'black', height: '48px' },
-            onError: () => setWallets((w) => ({ ...w, google: false }))
-          }
-        })
+    const walletParamsAll = {
+      ...(wallets.apple && {
+        apple: {
+          ...walletParams,
+          elementId: 'kneetic-applepay',
+          style: { theme: 'dark', height: '48px' },
+          onError: () => setWallets((w) => ({ ...w, apple: false }))
+        }
+      }),
+      ...(wallets.google && {
+        google: {
+          ...walletParams,
+          elementId: 'kneetic-googlepay',
+          style: { color: 'black', height: '48px' },
+          onError: () => setWallets((w) => ({ ...w, google: false }))
+        }
       })
-      .catch((e) => setCard((s) => ({ ...s, ready: true, error: errorMessage(e) })));
+    };
+    const cardParams = {
+      card: {
+        elementId: 'kneetic-card',
+        options: {
+          hidePostalCode: true,
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#10213d',
+              fontFamily:
+                '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif',
+              '::placeholder': { color: '#8a94a3' }
+            },
+            invalid: { color: '#d6282e', iconColor: '#d6282e' }
+          }
+        },
+        onReady: () => setCard((s) => ({ ...s, ready: true })),
+        onChange: (e: { complete?: boolean; error?: { message?: string } }) =>
+          setCard({ ready: true, complete: !!e.complete, error: e.error?.message || '' }),
+        onError: (e: unknown) => setCard((s) => ({ ...s, ready: true, error: errorMessage(e) }))
+      }
+    };
+
+    (async () => {
+      // Wallet buttons first (they sit at the top), then the card field. swell-js handles one
+      // createElements call at a time, so these run one after the other.
+      await stripeLoaded();
+      if (wallets.apple || wallets.google) {
+        try {
+          await swell.payment.createElements(walletParamsAll);
+        } catch {
+          setWallets({ apple: false, google: false });
+        }
+        setWalletsLoading(false);
+      }
+      try {
+        await swell.payment.createElements(cardParams);
+      } catch (e) {
+        setCard((s) => ({ ...s, ready: true, error: errorMessage(e) }));
+      }
+    })();
     // Mount once per page load. Wallet flags are read at that moment on purpose.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, placeOrder]);
@@ -940,8 +973,18 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
             <section className={css.section}>
               <h2 className={css.sectionTitle}>Express checkout</h2>
               <div className={css.wallets}>
-                {wallets.apple && <div id="kneetic-applepay" className={css.wallet} />}
-                {wallets.google && <div id="kneetic-googlepay" className={css.wallet} />}
+                {wallets.apple && (
+                  <div
+                    id="kneetic-applepay"
+                    className={clsx(css.wallet, walletsLoading && css.walletLoading)}
+                  />
+                )}
+                {wallets.google && (
+                  <div
+                    id="kneetic-googlepay"
+                    className={clsx(css.wallet, walletsLoading && css.walletLoading)}
+                  />
+                )}
               </div>
               <p className={css.divider}>
                 <span>or pay with card</span>

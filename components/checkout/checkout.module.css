@@ -564,6 +564,15 @@
 .wallet:empty {
   display: none;
 }
+/* Placeholder with the button's size while Apple Pay / Google Pay load, so nothing jumps. */
+.walletLoading:empty {
+  display: block;
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #dfe4eb 0%, #eef1f5 50%, #dfe4eb 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
 .divider {
   display: flex;
   align-items: center;

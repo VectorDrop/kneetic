@@ -3,6 +3,7 @@ import { Checkout } from 'components/checkout/checkout';
 import { bodyFont, displayFont } from 'components/sales/fonts';
 import { getSalesProduct } from 'lib/swell/sales';
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { notFound } from 'next/navigation';
 
 // Node.js runtime: the edge runtime's 1 MB limit (Vercel Hobby) is too small for the Swell SDK.
@@ -24,13 +25,23 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
   // (items, prices, totals) is loaded live from Swell in the browser.
   const product = await getSalesProduct();
 
+  const storeId = process.env.SWELL_STORE_ID || '';
+
   return (
-    <Checkout
-      checkoutId={params.id}
-      storeId={process.env.SWELL_STORE_ID || ''}
-      publicKey={process.env.SWELL_PUBLIC_KEY || ''}
-      product={product}
-      className={clsx(displayFont.variable, bodyFont.variable)}
-    />
+    <>
+      {/* Start the connections and the Stripe download right away, while the cart loads. */}
+      <link rel="preconnect" href="https://js.stripe.com" />
+      <link rel="preconnect" href="https://api.stripe.com" />
+      {storeId && <link rel="preconnect" href={`https://${storeId}.swell.store`} crossOrigin="" />}
+      <link rel="preconnect" href="https://vault.schema.io" />
+      <Script src="https://js.stripe.com/v3/" strategy="afterInteractive" />
+      <Checkout
+        checkoutId={params.id}
+        storeId={storeId}
+        publicKey={process.env.SWELL_PUBLIC_KEY || ''}
+        product={product}
+        className={clsx(displayFont.variable, bodyFont.variable)}
+      />
+    </>
   );
 }
