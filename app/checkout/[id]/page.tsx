@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation';
 export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
-  title: 'Secure Checkout',
+  title: { absolute: 'Secure Checkout | KNEETIC' },
   robots: { index: false, follow: false }
 };
 

@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
-  title: 'Order Confirmed',
+  title: { absolute: 'Order Confirmed | KNEETIC' },
   robots: { index: false, follow: false }
 };
 
