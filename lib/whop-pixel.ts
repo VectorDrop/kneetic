@@ -10,6 +10,7 @@
  *   purchase        order completed (thank-you page), value = order total
  *
  * Whop counts each event name + event_id pair once, so reloads never double-count.
+ * Each event is also sent to the Meta Pixel (ViewContent, AddToCart, InitiateCheckout, Lead, Purchase).
  */
 
 export type WhopParams = {
@@ -29,6 +30,46 @@ export type WhopParams = {
 };
 
 type WhopGlobal = { track: (event: string, params?: Record<string, unknown>) => void };
+
+type Fbq = (
+  cmd: 'track',
+  event: string,
+  params: Record<string, unknown>,
+  options?: { eventID?: string }
+) => void;
+
+/** The same funnel moments as Meta Pixel standard events. */
+const META_EVENTS: Record<string, string> = {
+  view_content: 'ViewContent',
+  add_to_cart: 'AddToCart',
+  begin_checkout: 'InitiateCheckout',
+  lead: 'Lead',
+  purchase: 'Purchase'
+};
+
+/** Sends the matching Meta Pixel event (value + currency only, no personal details). */
+function metaTrack(event: string, data: Record<string, unknown>) {
+  const name = META_EVENTS[event];
+  if (!name) return;
+  const params: Record<string, unknown> = {};
+  if (typeof data.value === 'number') params.value = data.value;
+  if (typeof data.currency === 'string') params.currency = data.currency;
+  const eventID = typeof data.event_id === 'string' ? data.event_id : undefined;
+  const started = Date.now();
+  const send = () => {
+    const fbq = (window as unknown as { fbq?: Fbq }).fbq;
+    if (typeof fbq === 'function') {
+      try {
+        fbq('track', name, params, eventID ? { eventID } : undefined);
+      } catch {
+        // Tracking must never break the store.
+      }
+      return;
+    }
+    if (Date.now() - started < 10000) setTimeout(send, 100);
+  };
+  send();
+}
 
 /** A fresh id for events that happen once per action (e.g. a button tap). */
 export function newEventId(prefix: string): string {
@@ -52,6 +93,7 @@ function clean(params: WhopParams): Record<string, unknown> {
 export function whopTrack(event: string, params: WhopParams = {}): void {
   if (typeof window === 'undefined') return;
   const data = clean(params);
+  metaTrack(event, data);
   const started = Date.now();
   const send = () => {
     const whop = (window as unknown as { whop?: WhopGlobal }).whop;
