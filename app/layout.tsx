@@ -1,5 +1,6 @@
 import Navbar from 'components/layout/navbar';
 import { HideOnPaths } from 'components/sales/hide-on-paths';
+import { WhopPageViews } from 'components/tracking/whop-page-views';
 import { GeistSans } from 'geist/font';
 import { siteUrl } from 'lib/site-url';
 import { ensureStartsWith } from 'lib/utils';
@@ -46,6 +47,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <Script id="ms-clarity" strategy="afterInteractive">
           {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z7c3pxq3cv");`}
         </Script>
+        {/* Whop Ads tracking: counts a page view on every page. */}
+        <Script id="whop-ads" strategy="afterInteractive">
+          {`!function(w,d,s,u,n,a,b){if(w[n])return;a=w[n]={q:[],t:+new Date,s:[],o:u,track:function(){a.q.push([+new Date].concat([].slice.call(arguments)))},setScope:function(){a.s=[].slice.call(arguments).filter(function(x){return typeof x==="string"});a.q.push([+new Date,"setScope"].concat(a.s))},scope:function(){var c=[].slice.call(arguments);return{track:function(){a.q.push([+new Date].concat([].slice.call(arguments)).concat([{__scope:c}]))}}}};b=d.createElement(s);b.async=1;b.src=u+"/s.js";d.getElementsByTagName(s)[0].parentNode.insertBefore(b,d.getElementsByTagName(s)[0])}(window,document,"script","https://t.whop.tw","whop");whop.setScope("biz_Zxr6c5SWMTuZzV");whop.track("page");`}
+        </Script>
+        <WhopPageViews />
       </body>
     </html>
   );
