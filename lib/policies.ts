@@ -24,8 +24,11 @@ export const policyInfo = {
   shipping: {
     /** TODO: time to pack and hand the order to the carrier. */
     processing: '1–3 business days',
-    /** TODO: typical delivery time after dispatch. Check with your supplier/fulfillment partner. */
-    delivery: '7–14 business days',
+    /**
+     * Total time from order to the customer's door (processing included). Also used for the
+     * estimated delivery dates in checkout and on the thank-you page.
+     */
+    delivery: '5–10 business days',
     /** Where you ship to. */
     regions: 'the United States and most countries worldwide',
     /** How many days after the expected delivery date customers can report a missing order. */
@@ -75,7 +78,7 @@ export const policies: Policy[] = [
       {
         h: 'Delivery time',
         p: [
-          `After dispatch, most orders arrive within ${i.shipping.delivery}. Delivery times are estimates, not guarantees. Carrier delays, customs checks and peak seasons can add a few days.`
+          `Most orders arrive within ${i.shipping.delivery} of your order, processing time included. Delivery times are estimates, not guarantees. Carrier delays, customs checks and peak seasons can add a few days.`
         ]
       },
       {
