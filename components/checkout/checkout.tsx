@@ -127,14 +127,9 @@ function validateAddress(prefix: string, a: Address): Errors {
 /** Field id for an error key like "ship.zip" -> "ship-zip". */
 const fieldId = (key: string) => key.replace('.', '-');
 
-function addBusinessDays(from: Date, days: number): Date {
+function addDays(from: Date, days: number): Date {
   const d = new Date(from.getTime());
-  let left = days;
-  while (left > 0) {
-    d.setDate(d.getDate() + 1);
-    const day = d.getDay();
-    if (day !== 0 && day !== 6) left -= 1;
-  }
+  d.setDate(d.getDate() + days);
   return d;
 }
 
@@ -747,8 +742,8 @@ export function Checkout({ checkoutId, storeId, publicKey, product, className }:
   }
 
   const today = new Date();
-  const arriveFrom = shortDate(addBusinessDays(today, c.arrival.minDays));
-  const arriveTo = shortDate(addBusinessDays(today, c.arrival.maxDays));
+  const arriveFrom = shortDate(addDays(today, c.arrival.minDays));
+  const arriveTo = shortDate(addDays(today, c.arrival.maxDays));
   const services = cart.shipment_rating?.services || [];
   const service = services.find((s) => s.id === cart.shipping?.service) || services[0];
 

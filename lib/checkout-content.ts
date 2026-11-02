@@ -24,7 +24,7 @@ export const checkoutContent = {
   supportEmail: policyInfo.email,
   secureLabel: 'Secure checkout',
 
-  /** Estimated arrival in business days after the order (`delivery` in policies.ts, e.g. 5–10). */
+  /** Estimated arrival in calendar days after the order (`delivery` in policies.ts, e.g. 5–10). */
   arrival: { minDays: arrivalMin, maxDays: arrivalMax },
   processing: policyInfo.shipping.processing,
 

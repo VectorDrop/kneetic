@@ -12,14 +12,9 @@ import { loadSwell, swellError, type SwellOrder } from './swell-browser';
 
 type Props = { checkoutId: string; storeId: string; publicKey: string; className?: string };
 
-function addBusinessDays(from: Date, days: number): Date {
+function addDays(from: Date, days: number): Date {
   const d = new Date(from.getTime());
-  let left = days;
-  while (left > 0) {
-    d.setDate(d.getDate() + 1);
-    const day = d.getDay();
-    if (day !== 0 && day !== 6) left -= 1;
-  }
+  d.setDate(d.getDate() + days);
   return d;
 }
 
@@ -103,8 +98,8 @@ export function Thanks({ checkoutId, storeId, publicKey, className }: Props) {
   const firstName = ship?.first_name || (ship?.name || '').split(' ')[0] || '';
   const email = order.account?.email;
   const placed = order.date_created ? new Date(order.date_created) : new Date();
-  const arriveFrom = shortDate(addBusinessDays(placed, c.arrival.minDays));
-  const arriveTo = shortDate(addBusinessDays(placed, c.arrival.maxDays));
+  const arriveFrom = shortDate(addDays(placed, c.arrival.minDays));
+  const arriveTo = shortDate(addDays(placed, c.arrival.maxDays));
   const cardInfo = order.billing?.card;
 
   return (

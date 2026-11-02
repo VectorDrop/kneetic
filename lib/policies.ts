@@ -28,7 +28,7 @@ export const policyInfo = {
      * Total time from order to the customer's door (processing included). Also used for the
      * estimated delivery dates in checkout and on the thank-you page.
      */
-    delivery: '5–10 business days',
+    delivery: '5–10 days',
     /** Where you ship to. */
     regions: 'the United States and most countries worldwide',
     /** How many days after the expected delivery date customers can report a missing order. */
