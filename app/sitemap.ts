@@ -1,37 +1,20 @@
-import { getCategories, getProducts } from 'lib/swell';
-import { validateEnvironmentVariables } from 'lib/utils';
+import { policies } from 'lib/policies';
+import { siteUrl } from 'lib/site-url';
 import { MetadataRoute } from 'next';
 
-type Route = {
-  url: string;
-  lastModified: string;
-};
-
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000';
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  validateEnvironmentVariables();
-
-  const routesMap = [''].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date().toISOString()
-  }));
-
-  const collectionsPromise = getCategories().then((categories) =>
-    categories.map((category) => ({
-      url: `${baseUrl}${category.slug}`
+/**
+ * Pages Google should index: the sales page (homepage) and the store policies.
+ * Checkout, search and the old template product pages are left out on purpose.
+ */
+export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date().toISOString();
+  return [
+    { url: siteUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    ...policies.map((p) => ({
+      url: `${siteUrl}/policies/${p.slug}`,
+      lastModified: now,
+      changeFrequency: 'yearly' as const,
+      priority: 0.3
     }))
-  );
-
-  const productsPromise = getProducts({}).then((products) =>
-    products.map((product) => ({
-      url: `${baseUrl}/product/${product.slug}`
-    }))
-  );
-
-  const fetchedRoutes = (await Promise.all([collectionsPromise, productsPromise])).flat();
-
-  return [...routesMap, ...fetchedRoutes];
+  ];
 }

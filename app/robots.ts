@@ -1,15 +1,10 @@
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000';
+import { siteUrl } from 'lib/site-url';
+import { MetadataRoute } from 'next';
 
-export default function robots() {
+export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [
-      {
-        userAgent: '*'
-      }
-    ],
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl
+    rules: [{ userAgent: '*', allow: '/', disallow: ['/checkout/', '/api/'] }],
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl
   };
 }
