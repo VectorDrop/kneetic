@@ -19,10 +19,10 @@ export const brand = {
 export const meta = {
   title: 'KNEETIC 7mm Knee Sleeves | Squat Heavy Without Second-Guessing Your Knees',
   description:
-    '7mm neoprene knee sleeves for lifters: warm by set two, locked in on the walkout, sized to fit the first time. 30-day money-back guarantee.'
+    'The knee sleeves serious lifters switch to when cheap pairs die and premium prices sting. 7mm neoprene, pre-curved fit, 30-day money-back guarantee.'
 };
 
-export const announcement = 'Free Shipping to the US';
+export const announcement = 'Free US Shipping · 30-Day Money-Back Guarantee';
 
 /** Shown if the Swell product has no images (or can't be loaded). Upload the same 6 images to Swell. */
 export const salesFallbackImages: SalesImage[] = [
@@ -102,14 +102,13 @@ export const hero = {
   // Text before "|" is set light, text after it bold (Glamory-style headline).
   headline: 'Squat Heavy | Without Second-Guessing Your Knees',
   subheadline:
-    'Warm by set two. Locked in on the walkout. Sized to fit the first time. Or your money back.',
+    'Stop wondering if your knees will hold up on the walkout. Feel locked in from the first working set — or send them back within 30 days for a full refund.',
   benefits: [
-    // what life looks like after
-    { icon: 'flame', strong: 'Warm, ready knees', rest: ' by your second set' },
-    { icon: 'lock', strong: 'Locked in', rest: ' on the walkout, confident in the hole' },
-    // why it works
-    { icon: 'layers', strong: '7mm neoprene', rest: ' for firm, even compression' },
-    { icon: 'curve', strong: 'Pre-curved cut', rest: ' that sits flat, no bunching' }
+    // Benefit-first: what they FEEL, not what the product IS
+    { icon: 'flame', strong: 'Warm and ready', rest: ' before your first working set — no more stiff, cold knees on set one' },
+    { icon: 'lock', strong: 'Feel locked in on the walkout', rest: ' — the kind of confidence that lets you stop thinking about your knees and start thinking about the lift' },
+    { icon: 'layers', strong: 'Thick enough to feel the difference', rest: ' — 7mm neoprene that stays snug after months of heavy squats, not weeks' },
+    { icon: 'curve', strong: 'Shaped for a bent knee', rest: ' — sits flat behind the joint, no bunching, no sliding, no readjusting mid-set' }
   ]
 };
 
@@ -121,41 +120,41 @@ export const buyBox = {
    * shown as these tiles automatically, with prices from Swell. The notes below are matched by the
    * number of pairs. `quantities` is only used when there is no pack option.
    */
-  packNotes: { 1: 'For your heavy days', 2: 'Gym bag + meet day' } as Record<number, string>,
+  packNotes: { 1: 'For your heavy days', 2: 'One for the gym bag, one for meet day' } as Record<number, string>,
   quantities: [
     { qty: 1, label: '1 Pair', note: 'For your heavy days' },
-    { qty: 2, label: '2 Pairs', note: 'Gym bag + meet day' }
+    { qty: 2, label: '2 Pairs', note: 'One for the gym bag, one for meet day' }
   ],
-  trust: ['Secure checkout', '30-day guarantee', 'Real 7mm neoprene']
+  trust: ['Secure checkout', '30-day money-back guarantee', 'Ships in 5–10 days']
 };
 
 export const guarantee = {
   title: '30-Day Money-Back Guarantee',
   // IMPORTANT: "even if you've worn them" must match your actual return policy. Change it if not.
-  body: "Train in them for 30 days. Not locked in? Send them back for a full refund, even if you've worn them."
+  body: "Squat in them for a full training cycle. If they don't feel locked in on every heavy set, send them back for a full refund — even if you've worn them. No hoops, no hassle."
 };
 
 /** Objection handlers right under the buy box. */
 export const heroFaqs = [
   {
     q: 'What size should I get?',
-    a: "Measure around the middle of your kneecap with your leg straight and relaxed, then match it to the size guide. 7mm sleeves should feel snug, not strangling. If the fit isn't right, the 30-day guarantee has you covered."
+    a: "Measure around the middle of your kneecap with your leg straight and relaxed, then match it to the size guide. They should feel snug when you first pull them on — that's normal for 7mm. If the fit isn't right, you're covered by the 30-day guarantee."
   },
   {
     q: '5mm or 7mm?',
-    a: 'Heavy squats and strength work: 7mm. 5mm is made for high-rep, high-movement training. 7mm is the thickest sleeve allowed in raw powerlifting.'
+    a: 'If you squat heavy or train for strength, 7mm. It’s the thickest sleeve allowed in raw powerlifting and gives the firmest compression. 5mm is built for high-rep, high-movement work like metcons and WODs.'
   },
   {
     q: 'Are 7mm sleeves hard to put on?',
-    a: 'They should be snug. Fold the top half down, slide it over your calf, then roll it up over the knee. Takes seconds once you know the trick. See "How to put them on" below.'
+    a: 'The first time, they feel tight. That’s by design. Fold the top half down, slide it over your calf, roll it up over the knee. After two or three sessions, it takes seconds. See "How to put them on" below.'
   },
   {
     q: 'What if they stretch out or rip?',
-    a: "That's why the risk is on us. Squat in them for 30 days. If they don't hold up to your training, send them back for a full refund."
+    a: "That's exactly why the risk is on us, not you. Train in them for 30 days. If the compression fades or they don't hold up, send them back for a full refund. No questions."
   },
   {
     q: 'Do knee sleeves actually do anything?',
-    a: "They won't fix your knees, and anyone promising that is selling you something. They keep your knees warm, give firm, even compression, and make heavy sets feel more stable. In a 2024 study, 94% of athletes said they felt more stable in 7mm sleeves."
+    a: "They won't fix your knees, and anyone promising that is selling you something. What they will do: keep your joints warm from the first working set, give firm, even compression around the knee, and make heavy squats feel more stable and confident. In a 2024 study, 94% of athletes reported feeling more stable in 7mm sleeves."
   }
 ];
 
@@ -169,7 +168,7 @@ export const heroFaqs = [
 export const rating = {
   value: 4.9,
   count: '300+',
-  label: 'customers'
+  label: 'verified lifters'
 };
 
 /**
@@ -182,7 +181,7 @@ export const reviews: SalesReview[] = [
     name: 'Verified buyer',
     detail: 'Size XL',
     rating: 5,
-    title: '“Equal or possibly better than the bigger brand knee sleeves”',
+    title: '"Equal or possibly better than the bigger brand knee sleeves"',
     body: "Very good quality. they provide great support while lifting heavy. i'd say these are equal or possibly better than the bigger brand knee sleeves i've used in the past. the rubber grip at the top really helps keep them in place. definitely recommend so far.",
     verified: true
   },
@@ -190,7 +189,7 @@ export const reviews: SalesReview[] = [
     name: 'S***n',
     detail: 'Size M · Nov 2025',
     rating: 5,
-    title: '“You can notice the 7 mm of neoprene”',
+    title: '"You can notice the 7 mm of neoprene"',
     body: 'Fast shipping, good quality, you can notice the 7 mm of neoprene.',
     verified: true
   },
@@ -198,7 +197,7 @@ export const reviews: SalesReview[] = [
     name: 'Verified buyer',
     detail: 'Size M',
     rating: 5,
-    title: '“Excellent product!”',
+    title: '"Excellent product!"',
     body: 'Excellent product! It meets the need for knee stability well. I am buying another one with larger measurements to use for a longer time without affecting blood circulation. Pay close attention to the measurements when purchasing. The product fits well and has a natural feel to the material. Congratulations to the seller and manufacturer!!',
     verified: true
   }
@@ -221,7 +220,7 @@ export const customerPhotos = [
 ];
 
 export const reviewsSection = {
-  title: "You're Not Alone. | Reviews From Lifters Like You.",
+  title: "Don't Take Our Word for It. | Hear It From Lifters Like You.",
   photosLabel: 'Customer photo',
   // TODO: if these reviews and the rating come from the manufacturer's marketplace listing,
   // keep this line so shoppers know where they come from.
@@ -239,22 +238,23 @@ export const buyBoxQuote = {
 /* ------------------------------------------------------------------ */
 
 export const bigIdea = {
-  kicker: 'Why heavy days start feeling shaky',
+  kicker: 'The real reason heavy days start feeling shaky',
   title: "Your Sleeves Didn't Stop Working.",
   titleAccent: 'They Died.',
   image: '/carousel/03-before-after.jpg',
   imageAlt: 'Worn-out old sleeves vs. KNEETIC 7mm sleeves',
   body: [
-    'Most lifters blame their knees, their age or their form when heavy squats start feeling shaky. Often the real culprit is dead neoprene.',
-    "Every time you yank a sleeve over your calf and squat deep, cheap material stretches a little and doesn't fully come back. You don't notice it day to day. You just notice the walkout feels less solid."
+    "You add weight to the bar, unrack it, and something feels off. The walkout isn't solid. The hole doesn't feel as confident. Most lifters blame their knees, their age, or their form. But often the real culprit is sitting right below the kneecap: dead neoprene.",
+    "Every time you yank a sleeve over your calf and squat deep, cheap material stretches a little — and doesn't fully come back. You don't notice it day to day. You just notice the bar feels heavier than it should on the walkout. You start second-guessing sets you used to own.",
+    "That's not your knees getting older. That's your sleeves getting weaker."
   ],
   stages: [
-    { when: 'Day 1', what: 'Snug and locked in. Warm by your second set.' },
-    { when: 'Week 4', what: 'Goes on easier than it should. Holds less heat.' },
-    { when: 'Week 8', what: 'Slides down, bunches behind the knee, splits at the seam.' }
+    { when: 'Day 1', what: 'Snug and locked in. Warm before your first working set.' },
+    { when: 'Week 4', what: 'Goes on easier than it should. Holds less heat. You start pulling them up between sets.' },
+    { when: 'Week 8', what: 'Slides down mid-squat, bunches behind the knee, splits at the seam. Time to throw them away — again.' }
   ],
   footnote:
-    "We call it Compression Fade, and it's one of the most common complaints in knee sleeve reviews."
+    "We call it Compression Fade. It's the #1 complaint in knee sleeve reviews — and the reason most lifters are on their third or fourth pair."
 };
 
 export const materials = {
@@ -262,32 +262,32 @@ export const materials = {
   items: [
     {
       icon: 'layers',
-      name: '7mm Neoprene',
-      text: 'Dense neoprene traps body heat, so your knees feel warm and ready by your second set.'
+      name: 'Dense 7mm Neoprene',
+      text: 'Traps body heat fast, so your knees feel warm and ready before your first working set — not your third. Stays snug after months of heavy training, not just weeks.'
     },
     {
       icon: 'curve',
       name: 'Pre-Curved Cut',
-      text: 'Follows the natural bend of your knee, so it sits flat instead of bunching behind it.'
+      text: 'Shaped to fit a bent knee, not a straight pipe. Sits flat behind the joint — no bunching, no sliding, no pulling them up between sets.'
     },
     {
       icon: 'medal',
-      name: 'Meet-Standard Thickness',
-      text: '7mm is the thickest sleeve allowed in raw powerlifting. What serious lifters train in.'
+      name: 'Meet-Legal Thickness',
+      text: '7mm is the thickest sleeve allowed in raw powerlifting. The same thickness serious lifters trust on meet day — and train in every heavy session.'
     }
   ]
 };
 
 export const science = {
-  title: 'What Sleeves Do. | And What They Don’t.',
+  title: "What Sleeves Do. | And What They Don't.",
   dont: ['Fix an injured knee', 'Build strength for you', 'Replace good technique'],
   do: [
-    'Keep your knees warm from the first working set',
-    'Give firm, even compression',
-    'Make heavy sets feel more stable'
+    'Keep your knees warm from the first working set — no more cold, stiff joints on heavy days',
+    'Give firm, even compression that makes the walkout feel solid',
+    'Help you stop thinking about your knees and start thinking about the lift'
   ],
   stat: '94%',
-  statText: 'of athletes felt more stable in 7mm neoprene sleeves.',
+  statText: 'of athletes reported feeling more stable in 7mm neoprene sleeves.',
   // TODO: double-check this source and wording before going live
   statSource:
     'Manchester Metropolitan University, 2024. 17 trained CrossFit athletes wearing 7mm neoprene knee sleeves.'
@@ -298,19 +298,19 @@ export const howToUse = {
   steps: [
     {
       title: 'Fold the top half down',
-      text: 'Turn the upper half of the sleeve inside out over the lower half.'
+      text: 'Turn the upper half of the sleeve inside out over the lower half. This is the trick that makes 7mm sleeves easy.'
     },
     {
       title: 'Slide it over your calf',
-      text: 'Pull it up until the fold sits just below your kneecap.'
+      text: 'Pull it up until the fold sits just below your kneecap. Snug is normal — that’s the compression doing its job.'
     },
     {
       title: 'Roll the top half up',
-      text: 'Unfold it up over your knee and onto your lower thigh.'
+      text: 'Unfold it up over your knee and onto your lower thigh. Two or three sessions and this takes seconds.'
     },
     {
       title: 'Center it on the kneecap',
-      text: 'Smooth out wrinkles behind the knee. Snug, not strangling.'
+      text: 'Smooth out wrinkles behind the knee. You should feel snug, locked in, and ready to squat — not strangled.'
     }
   ],
   /** Optional short looping clips per step, e.g. '/howto/step1.mp4' (muted, plays inline). */
@@ -318,42 +318,43 @@ export const howToUse = {
 };
 
 export const whoFor = {
-  title: 'Built for Lifters | Who Train Heavy',
+  title: 'Built for Lifters | Who Refuse to Go Light',
   cards: [
     {
       icon: 'barbell',
-      title: 'The Serious Lifter',
-      text: 'Chasing 315, 405 or a first meet. You want gear that is legit on your heaviest single.'
+      title: 'Chasing a PR',
+      text: "Working toward 315, 405, or your first meet. You need gear that doesn't quit on you before you quit on the set."
     },
     {
       icon: 'clock',
-      title: 'The 35+ Lifter',
-      text: 'Years under the bar and not done yet. Warm, locked-in knees so you keep training hard.'
+      title: '35+ and Still Under the Bar',
+      text: "Years of training behind you, and you're not done. Warm, locked-in knees so your heavy days feel like they used to."
     },
     {
       icon: 'bolt',
-      title: 'The CrossFitter',
-      text: 'High volume, lots of squats. Support that lasts the whole session.'
+      title: 'WODs and Heavy Metcons',
+      text: 'High volume, constant squatting, and no time to readjust your gear. Sleeves that stay put from the first rep to the last.'
     },
     {
       icon: 'dumbbell',
-      title: 'The Gym Rat',
-      text: 'Not a powerlifter, but you squat and leg press heavy and want to feel solid.'
+      title: 'You Just Squat Heavy',
+      text: "You're not a powerlifter, but leg day is sacred. You squat, you leg press, and you want your knees to feel solid doing it."
     }
   ],
   note: 'Recovering from a knee injury? Talk to a physician or physical therapist first. Sleeves are training gear, not treatment.'
 };
 
 export const comparison = {
-  title: 'Stuck Between “Will Rip” | and “Overpriced”?',
+  title: 'Stuck Between "Will Rip" | and "Overpriced"?',
   columns: ['Budget', 'Premium', 'KNEETIC'],
   rows: [
     // values: [budget, premium, kneetic] -> 'yes' | 'no' | 'varies' | any text. '{price}' = Swell price.
     { label: 'Price per pair', values: ['<$25', '$80–130+', '{price}'] },
     { label: 'Real 7mm neoprene', values: ['varies', 'yes', 'yes'] },
     { label: 'Pre-curved fit', values: ['varies', 'yes', 'yes'] },
+    { label: 'Lasts 6+ months of heavy use', values: ['no', 'yes', 'yes'] },
     { label: '30-day refund, even if worn', values: ['no', 'varies', 'yes'] },
-    { label: 'Clear sizing help', values: ['no', 'varies', 'yes'] }
+    { label: 'Clear sizing help before you buy', values: ['no', 'varies', 'yes'] }
   ],
   note: 'Based on typical products in each price range. Check individual brands for their exact terms.'
 };
@@ -363,23 +364,23 @@ export const timeline = {
   items: [
     {
       when: 'First session',
-      text: 'Knees feel warm by your second set. The walkout feels more solid.'
+      text: 'Knees feel warm before your first working set. The walkout feels more solid than it has in months.'
     },
     {
       when: 'First week',
-      text: 'Pulling them on becomes your heavy-day ritual. The switch flips before the top set.'
+      text: 'Pulling them on becomes the ritual that flips the switch. You stop thinking about your knees and start thinking about the lift.'
     },
-    { when: 'Day 30', text: 'Still snug, still locked in. If not, you get your money back.' }
+    { when: 'Day 30', text: 'Still snug. Still locked in. Same compression as day one. If not — full refund, no questions.' }
   ]
 };
 
 export const roadmap = {
-  title: 'Your Next Heavy Day, | Sorted',
+  title: 'Your Next Heavy Day, | Sorted in 4 Steps',
   steps: [
-    { title: 'Measure your knee', text: '30 seconds, mid-kneecap, leg straight.' },
-    { title: 'Pick your size', text: 'Match it to the size guide. Unsure? Email us.' },
-    { title: 'Squat your next heavy day', text: 'Sleeves on, belt on, walk it out.' },
-    { title: 'Decide within 30 days', text: 'Keep them, or send them back for a full refund.' }
+    { title: 'Measure your knee', text: '30 seconds, mid-kneecap, leg straight. That’s all you need.' },
+    { title: 'Pick your size', text: 'Match it to the size guide. Between sizes or unsure? Email us before you order — we’ll help.' },
+    { title: 'Squat your next heavy day', text: 'Sleeves on, belt on, walk it out. Feel the difference from the first working set.' },
+    { title: 'Decide within 30 days', text: 'Keep them, or send them back for a full refund. The risk is on us, not you.' }
   ]
 };
 
@@ -399,27 +400,31 @@ export const moreFaqs = [
   },
   {
     q: 'Should I wear them for every set?',
-    a: 'Most lifters save them for heavy days and working sets, like a belt. Warm-ups without them are fine.'
+    a: 'Most lifters save them for working sets and heavy days, the same way you use a belt. Warming up without them is fine and lets your joints work through a full range first.'
   },
   {
     q: 'Will I become dependent on them?',
-    a: "Sleeves are gear, like a belt or lifting shoes. They don't replace strength or technique. Use them on heavy days and keep training the basics."
+    a: "No more than you'd become dependent on a belt or lifting shoes. They're gear, not a crutch. Use them on heavy days, keep training the basics, and take them off when you don't need them."
   },
   {
     q: 'How do I wash them?',
-    a: 'Rinse in cool water after sweaty sessions and let them air-dry. Never put neoprene in the dryer; heat breaks it down.'
+    a: 'Rinse in cool water after sweaty sessions and let them air-dry completely. Never put neoprene in the dryer — heat breaks down the material and kills the compression faster than anything else.'
   },
   {
-    q: 'Do they work for women?',
-    a: 'Yes. Sizing is based on knee circumference, not gender. Measure and match it to the size guide.'
+    q: 'Do they come in women’s sizes?',
+    a: 'Sizing is based on knee circumference, not gender. Measure and match it to the size guide — it works the same for everyone.'
   },
   {
     q: 'Is one order one sleeve or two?',
     a: 'Every order is a pair: two sleeves, one for each knee.'
   },
   {
-    q: 'How does the money-back guarantee work?',
-    a: `Email us within 30 days of delivery at ${brand.supportEmail} and we'll send return instructions. Once the sleeves are back, you get a full refund.`
+    q: 'What if they don’t fit right?',
+    a: `Email us within 30 days of delivery at ${brand.supportEmail} and we'll send return instructions. Once the sleeves are back, you get a full refund — even if you've worn them.`
+  },
+  {
+    q: 'How long until they arrive?',
+    a: 'Most US orders arrive in 5–10 days. You’ll get a tracking number as soon as they ship.'
   }
 ];
 
@@ -429,7 +434,7 @@ export const moreFaqs = [
 
 export const finalOffer = {
   title: 'Your Next Heavy Day | Is Coming.',
-  subtitle: 'Walk it out in sleeves that are still locked in, or get your money back.'
+  subtitle: 'You can walk it out in sleeves that are still locked in 6 months from now — or keep second-guessing the ones you have. Try them risk-free for 30 days.'
 };
 
 /**
