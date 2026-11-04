@@ -473,6 +473,9 @@ export const sizeGuide = {
     'Wrap a soft tape measure around the middle of your kneecap.',
     'Match the number to the chart. 7mm sleeves should feel snug, not strangling.'
   ],
-  rows: [] as { size: string; cm: string; inches: string }[]
-  // e.g. { size: 'M', cm: '34–37 cm', inches: '13.4–14.6 in' },
+  rows: [
+    { size: 'M', cm: '33 – 36 cm', inches: '13.0″ – 14.2″' },
+    { size: 'L', cm: '36 – 40 cm', inches: '14.2″ – 15.7″' },
+    { size: 'XL', cm: '40 – 44 cm', inches: '15.7″ – 17.3″' }
+  ],
 };
